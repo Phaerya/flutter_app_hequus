@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'widgets/score_board.dart';
 import 'widgets/game_logic.dart';
+import 'widgets/flip_card.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,93 +32,92 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _game.initGame();
   }
 
   @override
   Widget build(BuildContext context) {
-    double screen_width = MediaQuery
-        .of(context)
-        .size
-        .width;
+    double screen_width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: const Color(0xffca1e27),
       body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Center(
-              child: Text(
-                "JEU DE MEMOIRE",
-                style: TextStyle(
-                    fontSize: 48.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Center(
+            child: Text(
+              "JEU DE MEMOIRE",
+              style: TextStyle(
+                  fontSize: 48.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            ),
+          ),
+          const SizedBox(
+            height: 24.0,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              scoreBoard("Tries", "$tries"),
+              scoreBoard("Score", "$score")
+            ],
+          ),
+          SizedBox(
+            height: screen_width,
+            width: screen_width,
+            child: GridView.builder(
+              itemCount: _game.gameImg!.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                crossAxisSpacing: 16.0,
+                mainAxisSpacing: 16.0,
               ),
-            ),
-            const SizedBox(
-              height: 24.0,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [scoreBoard("Tries", "$tries"), scoreBoard("Score", "$score")],
-            ),
-            SizedBox(
-                height: screen_width,
-                width: screen_width,
-                child: GridView.builder(
-                    itemCount: _game.gameImg!.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      crossAxisSpacing: 16.0,
-                      mainAxisSpacing: 16.0,
-                    ),
-                    padding: const EdgeInsets.all(16.0),
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          print(_game.cards_list[index]);
+              padding: const EdgeInsets.all(16.0),
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    print(_game.cards_list[index]);
+                    setState(() {
+                      tries++;
+                      _game.matchCheck.add({index: _game.cards_list[index]});
+                      _game.gameImg![index] = _game.cards_list[index];
+                    });
+
+                    if (_game.matchCheck.length == 2) {
+                      if (_game.matchCheck[0].values.first ==
+                          _game.matchCheck[1].values.first) {
+                        print(true);
+                        score += 100;
+                        _game.matchCheck.clear();
+                      } else {
+                        print(false);
+                        Future.delayed(const Duration(milliseconds: 750), () {
                           setState(() {
-                            tries++;
-                            _game.gameImg![index] = _game.cards_list[index];
-                            _game.matchCheck
-                                .add({index: _game.cards_list[index]});
+                            _game.gameImg![_game.matchCheck[0].keys.first] =
+                                _game.hiddenCard;
+                            _game.gameImg![_game.matchCheck[1].keys.first] =
+                                _game.hiddenCard;
+                            _game.matchCheck.clear();
                           });
-                          if(_game.matchCheck.length == 2){
-                            if(_game.matchCheck[0].values.first == _game.matchCheck[1].values.first ){
-                              print(true);
-                              score += 100;
-                              _game.matchCheck.clear();
-                            } else {
-                              print (false);
-                              Future.delayed(const Duration(milliseconds: 500), () {
-                                print(_game.gameImg);
-                                setState(() {
-                                  _game.gameImg![_game.matchCheck[0].keys.first] = _game.hiddenCard;
-                                  _game.gameImg![_game.matchCheck[1].keys.first] = _game.hiddenCard;
-                                  _game.matchCheck.clear();
-                                });
-                              });
-                            }
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(16.0),
-                          decoration: BoxDecoration(
-                              color: const Color(0xFF253031),
-                              borderRadius: BorderRadius.circular(8.0),
-                              image: DecorationImage(
-                                image: AssetImage(_game.gameImg![index]),
-                                fit: BoxFit.cover,
-                              )),
-                        ),
-                      );
-                    }))
-          ]),
+                        });
+                      }
+                    }
+                  },
+                  child: FlipCard(
+                    frontImage: _game.gameImg![index],
+                    backImage: _game.hiddenCard,
+                    isFlipped: _game.gameImg![index] != _game.hiddenCard,
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
