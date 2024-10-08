@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'widgets/score_board.dart';
 import 'widgets/game_logic.dart';
 import 'widgets/flip_card.dart';
+import 'widgets/end_game.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,7 +34,28 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    _game.matchCheck.clear();
     _game.initGame();
+  }
+
+  void _restartGame() {
+    setState(() {
+      tries = 0;
+      score = 0;
+      _game.matchCheck.clear();
+      _game.initGame();
+    });
+  }
+
+  void _checkEndGame() {
+    // Check for end of game conditions
+    if (tries >= 20) {
+      showEndGameDialog(
+          context, "Perdu !", "Vous avez atteint 30 essais !", _restartGame);
+    } else if (_game.gameImg!.every((image) => image != _game.hiddenCard)) {
+      showEndGameDialog(context, "Gagné !",
+          "Vous avez débloqué toutes les cartes !", _restartGame);
+    }
   }
 
   @override
@@ -62,7 +84,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              scoreBoard("Tries", "$tries"),
+              scoreBoard("Essais", "$tries"),
               scoreBoard("Score", "$score")
             ],
           ),
@@ -80,31 +102,34 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                    print(_game.cards_list[index]);
-                    setState(() {
-                      tries++;
-                      _game.matchCheck.add({index: _game.cards_list[index]});
-                      _game.gameImg![index] = _game.cards_list[index];
-                    });
+                    if (_game.gameImg![index] == _game.hiddenCard) {
+                      print(_game.cards_list[index]);
+                      setState(() {
+                        tries++;
+                        _game.matchCheck.add({index: _game.cards_list[index]});
+                        _game.gameImg![index] = _game.cards_list[index];
+                      });
 
-                    if (_game.matchCheck.length == 2) {
-                      if (_game.matchCheck[0].values.first ==
-                          _game.matchCheck[1].values.first) {
-                        print(true);
-                        score += 100;
-                        _game.matchCheck.clear();
-                      } else {
-                        print(false);
-                        Future.delayed(const Duration(milliseconds: 750), () {
-                          setState(() {
-                            _game.gameImg![_game.matchCheck[0].keys.first] =
-                                _game.hiddenCard;
-                            _game.gameImg![_game.matchCheck[1].keys.first] =
-                                _game.hiddenCard;
-                            _game.matchCheck.clear();
+                      if (_game.matchCheck.length == 2) {
+                        if (_game.matchCheck[0].values.first ==
+                            _game.matchCheck[1].values.first) {
+                          print(true);
+                          score += 100;
+                          _game.matchCheck.clear();
+                        } else {
+                          print(false);
+                          Future.delayed(const Duration(milliseconds: 750), () {
+                            setState(() {
+                              _game.gameImg![_game.matchCheck[0].keys.first] =
+                                  _game.hiddenCard;
+                              _game.gameImg![_game.matchCheck[1].keys.first] =
+                                  _game.hiddenCard;
+                              _game.matchCheck.clear();
+                            });
                           });
-                        });
+                        }
                       }
+                      _checkEndGame();
                     }
                   },
                   child: FlipCard(

@@ -7,11 +7,11 @@ class FlipCard extends StatefulWidget {
   final bool isFlipped;
 
   const FlipCard({
-    Key? key,
+    super.key,
     required this.frontImage,
     required this.backImage,
     this.isFlipped = false,
-  }) : super(key: key);
+  });
 
   @override
   _FlipCardState createState() => _FlipCardState();
@@ -36,9 +36,9 @@ class _FlipCardState extends State<FlipCard>
   void didUpdateWidget(FlipCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.isFlipped && !oldWidget.isFlipped) {
-      _controller.forward(); // Lancer l'animation
+      _controller.forward();
     } else if (!widget.isFlipped && oldWidget.isFlipped) {
-      _controller.reverse(); // Revenir à l'animation inverse
+      _controller.reverse();
     }
   }
 
