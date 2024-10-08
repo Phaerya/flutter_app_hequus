@@ -1,5 +1,5 @@
 class Game {
-  final String hiddenCard = 'assets/images/ab67706c0000d72c1f63b6282c73c8d789880bad.png';
+  final String hiddenCard = 'assets/images/hidden.png';
 
   List<String>? gameImg;
 

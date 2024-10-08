@@ -26,6 +26,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Game _game = Game();
+  int tries = 0;
+  int score = 0;
 
   @override
   void initState() {
@@ -40,8 +42,7 @@ class _HomePageState extends State<HomePage> {
         .of(context)
         .size
         .width;
-    int tries = 0;
-    int score = 0;
+
     return Scaffold(
       backgroundColor: const Color(0xffca1e27),
       body: Column(
@@ -107,7 +108,7 @@ class _HomePageState extends State<HomePage> {
                         child: Container(
                           padding: const EdgeInsets.all(16.0),
                           decoration: BoxDecoration(
-                              color: const Color(0xFFdda3b2),
+                              color: const Color(0xFF253031),
                               borderRadius: BorderRadius.circular(8.0),
                               image: DecorationImage(
                                 image: AssetImage(_game.gameImg![index]),
