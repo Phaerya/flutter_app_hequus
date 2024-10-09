@@ -28,5 +28,6 @@ class Game {
 
   void initGame() {
     gameImg = List.generate(cardCount, (index) => hiddenCard);
+    matchCheck.clear();
   }
 }
